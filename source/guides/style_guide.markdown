@@ -10,7 +10,9 @@ Style Guide
 
 **Style Guide Metadata**
 
-Version 1.1.2
+Version 2.0.0
+
+This is a forked version of the Puppet Labs Style Guide v1.1.2. Efforts are being made to have Puppet Labs adopt these modifications so we do not have to maintain the fork.
 
 ## 1. Terminology
 
@@ -20,15 +22,13 @@ interpreted as described in [RFC 2119](http://www.faqs.org/rfcs/rfc2119.html).
 
 ## 2. Puppet Version
 
-This style guide is largely specific to Puppet versions 2.6.x; some of its
-recommendations are based on some language features that became
-available in version 2.6.0 and later.
+This style guide is largely specific to Puppet versions 3.x.x.
 
 ## 3. Why a Style Guide?
 
 Puppet Labs develops modules for customers and the community, and these modules
 should represent the best known practice for module design and style. Since
-these modules are developed by many people across the organisation, a central
+these modules are developed by many people across the organization, a central
 reference was needed to ensure a consistent pattern, design, and style.
 
 ## 4. General Philosophies
@@ -89,7 +89,7 @@ Module manifests complying with this style guide:
 * Must use two-space soft tabs
 * Must not use literal tab characters
 * Must not contain trailing white space
-* Should not exceed an 80 character line width
+* ~~Should not exceed an 80 character line width~~
 * Should align fat comma arrows (`=>`) within blocks of attributes
 
 ## 7. Comments
@@ -103,8 +103,8 @@ most visible to text editors and other code lexers.
 
 ## 8. Quoting
 
-All strings that do not contain variables should be enclosed in
-single quotes.  Double quotes should be used when variable interpolation is
+All strings that do not contain variables shall be enclosed in
+single quotes.  Double quotes must be used when variable interpolation is
 required.  Double quotes may also be used to make a string more readable when
 it contains single quotes.  Quoting is optional when the string is an
 alphanumeric bare word and is not a resource title.
@@ -152,13 +152,17 @@ hyphens, but you should avoid them in the interest of consistent look-and-feel.)
 **Good:**
 
 {% highlight ruby %}
-    package { 'openssh': ensure => present }
+    package { 'openssh':
+      ensure => present,
+    }
 {% endhighlight %}
 
 **Bad:**
 
 {% highlight ruby %}
-    package { openssh: ensure => present }
+    package { openssh:
+      ensure => present,
+    }
 {% endhighlight %}
 
 ### 9.2. Arrow Alignment
@@ -197,7 +201,7 @@ attribute name.
 
 ### 9.3. Attribute Ordering
 
-If a resource declaration includes an `ensure` attribute, it should be the
+If a resource declaration includes an `ensure` attribute, it must be the
 first attribute specified.
 
 **Good:**
@@ -245,23 +249,23 @@ except in the rare cases where it would improve readability.
 
 {% highlight ruby %}
     file {
-      "/tmp/a":
-        content => "a";
-      "/tmp/b":
-        content => "b";
+      '/tmp/a':
+        content => 'a';
+      '/tmp/b':
+        content => 'b';
     }
 
     exec {
-      "change contents of a":
-        command => "sed -i.bak s/b/B/g /tmp/a";
-      "change contents of b":
-        command => "sed -i.bak s/b/B/g /tmp/b";
+      'change contents of a':
+        command => 'sed -i.bak s/b/B/g /tmp/a';
+      'change contents of b':
+        command => 'sed -i.bak s/b/B/g /tmp/b';
     }
 {% endhighlight %}
 
 ### 9.5. Symbolic Links
 
-In the interest of clarity, symbolic links should be declared by using an
+In the interest of clarity, symbolic links must be declared by using an
 ensure value of `ensure => link` and explicitly specifying a value for the
 `target` attribute. Using a path to the target as the ensure value is not
 recommended.
@@ -285,10 +289,9 @@ recommended.
 
 ### 9.6. File Modes
 
-File modes should be represented as 4 digits rather than 3.
+File modes shall be represented as 4 digits rather than 3.
 
-In addition, file modes should be specified as single-quoted strings instead of bare word 
-numbers.
+In addition, file modes shall be specified as single-quoted strings instead of bare word numbers.
 
 **Good:**
 
@@ -314,20 +317,18 @@ Resource defaults should be used in a very controlled manner, and should only
 be declared at the edges of your manifest ecosystem. Specifically, they may be declared:
 
 * At top scope in site.pp
-* In a class which is guaranteed to never declare another class and never be inherited by 
-another class.
+* In a class which is guaranteed to never declare another class and never be inherited by another class.
 
-This is due to the way resource defaults propagate through dynamic scope, which can have 
-unpredictable effects far away from where the default was declared.
+This is due to the way resource defaults propagate through dynamic scope, which can have unpredictable effects far away from where the default was declared.
 
 **Good:**
 
 {% highlight ruby %}
     # /etc/puppetlabs/puppet/manifests/site.pp:
     File {
-      mode  => '0644',
       owner => 'root',
       group => 'root',
+      mode  => '0644',
     }
 {% endhighlight %}
 
@@ -336,9 +337,9 @@ unpredictable effects far away from where the default was declared.
 {% highlight ruby %}
     # /etc/puppetlabs/puppet/modules/ssh/manifests/init.pp
     File {
-      mode  => '0600',
       owner => 'nobody',
       group => 'nogroup',
+      mode  => '0600',
     }
 
     class {'ssh::client':
@@ -358,9 +359,9 @@ resource declarations.
 
 {% highlight ruby %}
     $file_mode = $::operatingsystem ? {
-      debian => '0007',
-      redhat => '0776',
-      fedora => '0007',
+      'debian' => '0007',
+      'redhat' => '0776',
+      'fedora' => '0007',
     }
 
     file { '/tmp/readme.txt':
@@ -374,18 +375,16 @@ resource declarations.
 {% highlight ruby %}
     file { '/tmp/readme.txt':
       mode => $::operatingsystem ? {
-        debian => '0777',
-        redhat => '0776',
-        fedora => '0007',
+        'debian' => '0777',
+        'redhat' => '0776',
+        'fedora' => '0007',
       }
     }
 {% endhighlight %}
 
 ### 10.2. Defaults for Case Statements and Selectors
 
-Case statements should have default cases. Additionally, the default case should fail the
-catalog compilation when the resulting behavior cannot be predicted on the
-majority of platforms the module will be used on. If you want the default case to be "do nothing," include it as an explicit `default: {}` for clarity's sake.
+Case statements should have default cases. Additionally, the default case should fail the catalog compilation.  If you want the default case to be "do nothing," include it as an explicit `default: {}` for clarity's sake.
 
 For selectors, default selections should only be omitted if you explicitly want
 catalog compilation to fail when no value matches.
@@ -442,18 +441,20 @@ there are any X's they should be here".
 5. May declare relationships to other classes `Class['apache'] -> Class['local_yum']`
 6. May override resources
 7. May declare resource defaults
-8. May declare resources; resources of defined and custom types should go before those of core types
+8. May declare resources; ~~resources of defined and custom types should go before those of core types~~
 9. May declare resource relationships inside of conditionals
 
 The following example follows the recommended style:
 
 {% highlight ruby %}
-    class myservice($ensure='running') {
+    class myservice (
+      $ensure='running',
+    ) {
 
       if $ensure in [ running, stopped ] {
         $ensure_real = $ensure
       } else {
-        fail('ensure parameter must be running or stopped')
+        fail('ensure parameter must be \'running\' or \'stopped\'')
       }
 
       case $::operatingsystem {
@@ -461,7 +462,7 @@ The following example follows the recommended style:
           $package_list = 'openssh-server'
         }
         solaris: {
-          $package_list = [ SUNWsshr, SUNWsshu ]
+          $package_list = [ 'SUNWsshr', 'SUNWsshu' ]
         }
         default: {
           fail("Module ${module_name} does not support ${::operatingsystem}")
@@ -470,11 +471,15 @@ The following example follows the recommended style:
 
       $variable = 'something'
 
-      Package { ensure => present, }
+      File {
+        owner => 'root',
+        group => 'root',
+        mode => '0644',
+      }
 
-      File { owner => '0', group => '0', mode => '0644' }
-
-      package { $package_list: }
+      package { $package_list:
+        ensure => present,
+      }
 
       file { "/tmp/${variable}":
         ensure => present,
@@ -560,20 +565,23 @@ class when stopping a service, consider using a single class with an ensure
 parameter and conditional relationship declarations:
 
 {% highlight ruby %}
-    class bluetooth($ensure=present, $autoupgrade=false) {
+    class bluetooth (
+      $ensure      = present,
+      $autoupgrade = false,
+    ) {
        # Validate class parameter inputs. (Fail early and fail hard)
 
-       if ! ($ensure in [ "present", "absent" ]) {
-         fail("bluetooth ensure parameter must be absent or present")
+       if ! ($ensure in [ 'present', 'absent' ]) {
+         fail('bluetooth ensure parameter must be \'absent\' or \'present\'')
        }
 
        if ! ($autoupgrade in [ true, false ]) {
-         fail("bluetooth autoupgrade parameter must be true or false")
+         fail('bluetooth autoupgrade parameter must be \'true\' or \'false\'')
        }
 
        # Set local variables based on the desired state
 
-       if $ensure == "present" {
+       if $ensure == 'present' {
          $service_enable = true
          $service_ensure = running
          if $autoupgrade == true {
@@ -589,27 +597,24 @@ parameter and conditional relationship declarations:
 
        # Declare resources without any relationships in this section
 
-       package { [ "bluez-libs", "bluez-utils"]:
+       package { [ 'bluez-libs', 'bluez-utils']:
          ensure => $package_ensure,
        }
 
        service { hidd:
-         enable         => $service_enable,
-         ensure         => $service_ensure,
-         status         => "source /etc/init.d/functions; status hidd",
-         hasstatus      => true,
-         hasrestart     => true,
+         ensure     => $service_ensure,
+         enable     => $service_enable,
       }
 
       # Finally, declare relations based on desired behavior
 
-      if $ensure == "present" {
-        Package["bluez-libs"]  -> Package["bluez-utils"]
-        Package["bluez-libs"]  ~> Service[hidd]
-        Package["bluez-utils"] ~> Service[hidd]
+      if $ensure == 'present' {
+        Package['bluez-libs']  -> Package['bluez-utils']
+        Package['bluez-libs']  ~> Service[hidd]
+        Package['bluez-utils'] ~> Service[hidd]
       } else {
-        Service["hidd"]        -> Package["bluez-utils"]
-        Package["bluez-utils"] -> Package["bluez-libs"]
+        Service['hidd']        -> Package['bluez-utils']
+        Package['bluez-utils'] -> Package['bluez-libs']
       }
     }
 {% endhighlight %}
@@ -670,7 +675,7 @@ defaults).
     class ntp (
       $servers,
       $options   = "iburst",
-      $multicast = false
+      $multicast = false,
     ) {}
 {% endhighlight %}
 
@@ -680,34 +685,22 @@ defaults).
     class ntp (
       $options   = "iburst",
       $servers,
-      $multicast = false
+      $multicast = false,
     ) {}
 {% endhighlight %}
 
 ### 11.9 Class parameter defaults
 
 When writing a module that accepts class parameters sane defaults SHOULD be
-provided for optional parameters to allow the end user the option of not
-explicitly specifying the parameter when declaring the class.
+provided for optional parameters to allow the end user the option of overriding with Hiera.
 
 For example:
 
 {% highlight ruby %}
     class ntp(
-      $server = 'UNSET'
+      $server = 'us.pool.ntp.org'
     ) {
-
-      include ntp::params
-
-      $server_real = $server ? {
-        'UNSET' => $::ntp::params::server,
-        default => $server,
-      }
-
-      notify { 'ntp':
-        message => "server=[$server_real]",
-      }
-
+      ...
     }
 {% endhighlight %}
 
@@ -715,6 +708,7 @@ The reason this class is declared in this manner is to be fully compatible with
 all Puppet 2.6.x versions.  The following alternative method SHOULD NOT be used
 because it is not compatible with Puppet 2.6.2 and earlier.
 
+**Bad:**
 {% highlight ruby %}
 class ntp(
   $server = $ntp::params::server
@@ -731,42 +725,10 @@ Other SHOULD recommendations:
 
  * SHOULD use the \_real suffix to indicate a scope local variable for
    maintainability over time.
- * SHOULD use fully qualified namespace variables when pulling the value
-   from the module params class to avoid namespace collisions.
- * SHOULD declare the params class so the end user does not have to for the
-   module to function properly.
-
-This recommended pattern may be relaxed when Puppet 2.7 is more widely adopted
-and module compatibility with as many versions of 2.6.x is no longer a primary
-concern.
-
-This diff illustrates the changes between these two commonly used patterns and
-how to switch from one to the other.
-
-{% highlight diff %}
-    diff --git a/manifests/init.pp b/manifests/init.pp
-    index c16c3a0..7923ccb 100644
-    --- a/manifests/init.pp
-    +++ b/manifests/init.pp
-    @@ -12,9 +12,14 @@
-     #
-     class paramstest (
-       $mandatory,
-    -  $param = $paramstest::params::param
-    -) inherits paramstest::params {
-    +  $param = 'UNSET'
-    +) {
-    +  include paramstest::params
-    +  $param\_real = $param ? {
-    +    'UNSET' => $::paramstest::params::param,
-    +    default => $param,
-    +  }
-       notify { 'TEST':
-    -    message => " param=[$param] mandatory=[$mandatory]",
-    +    message => " param=[$param\_real] mandatory=[$mandatory]",
-       }
-     }
-{% endhighlight %}
+ * Must use fully qualified namespace variables when accessing variables in other
+   classes.
+ * ~~SHOULD declare the params class so the end user does not have to for the
+   module to function properly.~~
 
 ## 12. Tests
 
